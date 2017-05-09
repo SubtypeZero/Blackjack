@@ -1,26 +1,15 @@
 package me.subtypezero.games.api;
 
 public class Player {
-	private final int id;
 	private int balance;
 	private int bet;
 
 	/**
 	 * Create a new player
-	 * @param id the client id
 	 * @param balance the starting balance
 	 */
-	public Player(int id, int balance) {
-		this.id = id;
+	public Player(int balance) {
 		this.balance = balance;
-	}
-
-	/**
-	 * Get the player's id
-	 * @return the id
-	 */
-	public int getId() {
-		return id;
 	}
 
 	/**
