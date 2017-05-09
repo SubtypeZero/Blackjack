@@ -1,4 +1,4 @@
-package me.subtypezero.games.api;
+package me.subtypezero.games.api.cards;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -54,19 +54,19 @@ public class Deck {
 	}
 
 	/**
-	 * Take a card from the top of the deck
-	 * Note: Remember to put the card back later
-	 * @return a card from the deck
+	 * Take a cards from the top of the deck
+	 * Note: Remember to put the cards back later
+	 * @return a cards from the deck
 	 */
 	public Card takeCard() {
-		Card card = cards.get(0); // Get the first card
-		cards.remove(0); // Remove the card from the deck
+		Card card = cards.get(0); // Get the first cards
+		cards.remove(0); // Remove the cards from the deck
 		return card;
 	}
 
 	/**
-	 * Place a card at the bottom of the deck
-	 * @param card the card to put
+	 * Place a cards at the bottom of the deck
+	 * @param card the cards to put
 	 */
 	public void putCard(Card card) {
 		cards.add(card);
