@@ -26,10 +26,11 @@ public class Player extends Gambler {
 
 		while (!done) {
 			int highest = dealer.getHighest(getHandValues());
+			int lowest = dealer.getLowest(getHandValues());
 
 			ArrayList<Action> actions = new ArrayList<>();
 
-			if (highest < 0) {
+			if (highest < 0 && lowest > 21) {
 				return; // bust
 			}
 
