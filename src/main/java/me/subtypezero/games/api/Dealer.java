@@ -80,7 +80,7 @@ public class Dealer extends Gambler {
 	 * @param values the list of values
 	 * @return the highest value or -1
 	 */
-	private int getHighest(ArrayList<Integer> values) {
+	public int getHighest(ArrayList<Integer> values) {
 		Collections.sort(values); // sort values in ascending order
 
 		// remove values that are too high

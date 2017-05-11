@@ -1,6 +1,9 @@
 package me.subtypezero.games.api;
 
+import me.subtypezero.games.api.event.Action;
+
 import java.net.Socket;
+import java.util.ArrayList;
 
 public class Player extends Gambler {
 	private Socket socket;
@@ -18,16 +21,46 @@ public class Player extends Gambler {
 	}
 
 	public void takeTurn(Dealer dealer) {
+		boolean start = true;
 		boolean done = false;
 
 		while (!done) {
-			// get list of options (double, split, clear, deal, stand, hit, repeat)
-			// some options are only available in certain game states
+			int highest = dealer.getHighest(getHandValues());
 
-			// have the client choose an action
-			// handle action
+			ArrayList<Action> actions = new ArrayList<>();
 
-			done = true;
+			if (highest < 0) {
+				return; // bust
+			}
+
+			// hit or stand
+			actions.add(Action.HIT);
+			actions.add(Action.STAND);
+
+			if (start) {
+				for (int value : getHandValues()) {
+					if (9 <= value && value <= 11) {
+						// double (only available on opening hand of 9 to 11)
+						actions.add(Action.DOUBLE);
+					}
+				}
+				start = false;
+			}
+
+			// TODO get response from client
+			Action action = null;
+
+			switch (action) {
+				case DOUBLE:
+					bet = bet * 2; // double the bet
+					break;
+				case HIT:
+					dealer.dealCards(this, 1); // take another card
+					break;
+				case STAND:
+					done = true;
+					break;
+			}
 		}
 	}
 
