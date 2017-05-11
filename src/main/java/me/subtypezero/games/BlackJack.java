@@ -1,14 +1,15 @@
 package me.subtypezero.games;
 
+import me.subtypezero.games.api.Dealer;
 import me.subtypezero.games.api.Player;
-import me.subtypezero.games.api.card.Deck;
+import me.subtypezero.games.api.event.Result;
 
 import java.net.Socket;
 import java.util.LinkedList;
 
 public class BlackJack implements Runnable {
 	private LinkedList<Player> players;
-	private Deck deck;
+	private Dealer dealer;
 	private boolean running = true;
 
 	private final int INIT_BAL;
@@ -19,11 +20,7 @@ public class BlackJack implements Runnable {
 
 	public BlackJack(int initBal, int minBet, int maxBet, int decks) {
 		players = new LinkedList<>();
-		deck = new Deck();
-
-		if (decks > 1) {
-			deck.addDecks(decks - 1);
-		}
+		dealer = new Dealer(decks);
 
 		this.INIT_BAL = initBal;
 		this.MIN_BET = minBet;
@@ -37,19 +34,22 @@ public class BlackJack implements Runnable {
 
 			// Deal cards
 			for (Player player : players) {
-				// deal cards to players, update the clients
+				dealer.dealCards(player, 2);
 			}
 
 			// Players take turns
 			for (Player player : players) {
-				// player.takeTurn();
+				player.takeTurn(); // TODO find a way for the player to take more cards
 			}
 
 			// Dealer takes turn
-			// reveal hidden card
-			// draw to 16 and stand on 17
+			dealer.takeTurn();
 
 			// calculate results
+			for (Player player : players) {
+				Result result = dealer.getResult(player);
+				// handle result and make balance changes
+			}
 		}
 		// End of game
 	}
