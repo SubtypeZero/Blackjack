@@ -22,8 +22,25 @@ public class Dealer extends Gambler {
 	}
 
 	public void takeTurn() {
-		// reveal hidden card
-		// draw to 16 and stand on 17
+		// TODO reveal hidden card
+
+		boolean done = false;
+
+		while (!done) {
+			int highest = getHighest(getHandValues());
+			int lowest = getLowest(getHandValues());
+
+			if (highest < 0 && lowest > 21) {
+				return; // bust
+			}
+
+			if (highest <= 16 || lowest <= 16) {
+				// draw a card
+				addCard(deck.takeCard());
+			} else {
+				done = true;
+			}
+		}
 	}
 
 	/**
@@ -105,6 +122,22 @@ public class Dealer extends Gambler {
 		}
 
 		return highest;
+	}
+
+	/**
+	 * Get the lowest value from a list of values
+	 * @param values the list of values
+	 * @return the lowest value
+	 */
+	public int getLowest(ArrayList<Integer> values) {
+		int lowest = Integer.MAX_VALUE;
+
+		for (int value : values) {
+			if (value < lowest) {
+				lowest = value;
+			}
+		}
+		return lowest;
 	}
 
 	/**
