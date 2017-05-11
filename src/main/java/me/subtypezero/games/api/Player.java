@@ -1,14 +1,19 @@
 package me.subtypezero.games.api;
 
+import java.net.Socket;
+
 public class Player {
+	private Socket socket;
 	private int balance;
 	private int bet;
 
 	/**
 	 * Create a new player
+	 * @param socket the client socket
 	 * @param balance the starting balance
 	 */
-	public Player(int balance) {
+	public Player(Socket socket, int balance) {
+		this.socket = socket;
 		this.balance = balance;
 	}
 
