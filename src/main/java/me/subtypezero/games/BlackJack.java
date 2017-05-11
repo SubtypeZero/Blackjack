@@ -39,7 +39,7 @@ public class BlackJack implements Runnable {
 
 			// Players take turns
 			for (Player player : players) {
-				player.takeTurn(); // TODO find a way for the player to take more cards
+				player.takeTurn(dealer);
 			}
 
 			// Dealer takes turn

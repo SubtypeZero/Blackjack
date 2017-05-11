@@ -4,10 +4,8 @@ import me.subtypezero.games.api.card.Card;
 
 import java.util.ArrayList;
 
-public abstract class Gambler {
+public class Gambler {
 	private ArrayList<Card> cards = new ArrayList<>();
-
-	abstract void takeTurn();
 
 	/**
 	 * Get a list of the gambler's cards

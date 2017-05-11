@@ -17,8 +17,18 @@ public class Player extends Gambler {
 		this.balance = balance;
 	}
 
-	public void takeTurn() {
-		// have the client choose an action
+	public void takeTurn(Dealer dealer) {
+		boolean done = false;
+
+		while (!done) {
+			// get list of options (double, split, clear, deal, stand, hit, repeat)
+			// some options are only available in certain game states
+
+			// have the client choose an action
+			// handle action
+
+			done = true;
+		}
 	}
 
 	/**
