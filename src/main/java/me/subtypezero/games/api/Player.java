@@ -1,9 +1,13 @@
 package me.subtypezero.games.api;
 
+import me.subtypezero.games.api.card.Card;
+
 import java.net.Socket;
+import java.util.ArrayList;
 
 public class Player {
 	private Socket socket;
+	private ArrayList<Card> cards;
 	private int balance;
 	private int bet;
 
@@ -14,6 +18,7 @@ public class Player {
 	 */
 	public Player(Socket socket, int balance) {
 		this.socket = socket;
+		cards = new ArrayList();
 		this.balance = balance;
 	}
 
@@ -73,5 +78,31 @@ public class Player {
 	 */
 	public void setBet(int amount) {
 		this.bet = amount;
+	}
+
+	/**
+	 * Get a list of the player's cards
+	 * @return the cards in the hand
+	 */
+	public ArrayList<Card> getCards() {
+		return (ArrayList<Card>) cards.clone();
+	}
+
+	/**
+	 * Add a card to the player's hand
+	 * @param card the card to add
+	 */
+	public void addCard(Card card) {
+		cards.add(card);
+	}
+
+	/**
+	 * Clear the player's hand
+	 * @return the cards from the hand
+	 */
+	public ArrayList<Card> clearCards() {
+		ArrayList<Card> cards = getCards();
+		this.cards.clear();
+		return cards;
 	}
 }
