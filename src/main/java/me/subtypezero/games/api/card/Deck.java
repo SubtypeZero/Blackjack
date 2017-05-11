@@ -1,4 +1,4 @@
-package me.subtypezero.games.api.cards;
+package me.subtypezero.games.api.card;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -7,7 +7,7 @@ public class Deck {
 	private ArrayList<Card> cards;
 
 	/**
-	 * Load and shuffle a standard deck of cards
+	 * Load and shuffle a standard deck of card
 	 */
 	public Deck() {
 		cards = loadDeck();
@@ -15,7 +15,7 @@ public class Deck {
 	}
 
 	/**
-	 * Load a standard deck of cards
+	 * Load a standard deck of card
 	 */
 	private ArrayList<Card> loadDeck() {
 		ArrayList<Card> deck = new ArrayList<Card>();
@@ -27,8 +27,8 @@ public class Deck {
 	}
 
 	/**
-	 * Add a suit to a deck of cards
-	 * @param deck the deck of cards
+	 * Add a suit to a deck of card
+	 * @param deck the deck of card
 	 * @param suit the suit to add
 	 */
 	private void addSuit(ArrayList<Card> deck, Suit suit) {
@@ -38,7 +38,7 @@ public class Deck {
 	}
 
 	/**
-	 * Add more decks to the deck of cards
+	 * Add more decks to the deck of card
 	 * Note: Remember to shuffle the deck later
 	 * @param amount the number to decks to add
 	 */
@@ -54,33 +54,33 @@ public class Deck {
 	}
 
 	/**
-	 * Take a cards from the top of the deck
-	 * Note: Remember to put the cards back later
-	 * @return a cards from the deck
+	 * Take a card from the top of the deck
+	 * Note: Remember to put the card back later
+	 * @return a card from the deck
 	 */
 	public Card takeCard() {
-		Card card = cards.get(0); // Get the first cards
-		cards.remove(0); // Remove the cards from the deck
+		Card card = cards.get(0); // Get the first card
+		cards.remove(0); // Remove the card from the deck
 		return card;
 	}
 
 	/**
-	 * Place a cards at the bottom of the deck
-	 * @param card the cards to put
+	 * Place a card at the bottom of the deck
+	 * @param card the card to put
 	 */
 	public void putCard(Card card) {
 		cards.add(card);
 	}
 
 	/**
-	 * Shuffle the deck of cards
+	 * Shuffle the deck of card
 	 */
 	public void shuffle() {
 		shuffle(cards);
 	}
 
 	/**
-	 * Shuffle a deck of cards
+	 * Shuffle a deck of card
 	 * @param deck the deck to shuffle
 	 */
 	private void shuffle(ArrayList<Card> deck) {

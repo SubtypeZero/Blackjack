@@ -1,14 +1,14 @@
-package me.subtypezero.games.api.cards;
+package me.subtypezero.games.api.card;
 
 public class Card {
 	private Suit suit;
 	private int value;
 
 	/**
-	 * Create a new playing cards
+	 * Create a new playing card
 	 * Note: 11-13
 	 * @param suit the suit
-	 * @param value the value of the cards
+	 * @param value the value of the card
 	 */
 	public Card(Suit suit, int value) {
 		this.suit = suit;
@@ -16,7 +16,7 @@ public class Card {
 	}
 
 	/**
-	 * Get the suit that the cards belongs to
+	 * Get the suit that the card belongs to
 	 * @return the suit
 	 */
 	public Suit getSuit() {
@@ -24,7 +24,7 @@ public class Card {
 	}
 
 	/**
-	 * Get the actual value of the cards
+	 * Get the actual value of the card
 	 * @return the value
 	 */
 	public int getValue() {
@@ -32,7 +32,7 @@ public class Card {
 	}
 
 	/**
-	 * Get the face value of the cards
+	 * Get the face value of the card
 	 * @return the face value
 	 */
 	public int getFaceValue() {
