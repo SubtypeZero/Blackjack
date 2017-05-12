@@ -43,12 +43,35 @@ public class BlackJack implements Runnable {
 			}
 
 			// Dealer takes turn
+			// TODO reveal hidden card
 			dealer.takeTurn();
 
-			// calculate results
+			// Calculate results
 			for (Player player : players) {
 				Result result = dealer.getResult(player);
-				// handle result and make balance changes
+
+				int bet = player.getBet();
+				player.setBet(0);
+
+				switch (result) {
+					case WIN:
+						// return bet and give reward
+						player.giveMoney(bet * 2);
+						break;
+					case LOSE:
+						// lose bet
+						break;
+					case PUSH:
+						// return bet
+						player.giveMoney(bet);
+						break;
+					case BLACKJACK:
+						// return bet and give bonus reward
+						player.giveMoney((int)(bet * 2.5));
+						break;
+				}
+
+				// TODO Update client
 			}
 		}
 		// End of game

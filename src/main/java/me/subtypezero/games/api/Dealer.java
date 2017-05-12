@@ -22,8 +22,6 @@ public class Dealer extends Gambler {
 	}
 
 	public void takeTurn() {
-		// TODO reveal hidden card
-
 		boolean done = false;
 
 		while (!done) {
