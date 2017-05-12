@@ -6,7 +6,7 @@ public class Card {
 
 	/**
 	 * Create a new playing card
-	 * Note: 11-13
+	 * Note: 11-13 represent Jack, King, and Queen
 	 * @param suit the suit
 	 * @param value the value of the card
 	 */

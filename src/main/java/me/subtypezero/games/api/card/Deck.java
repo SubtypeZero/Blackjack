@@ -18,7 +18,7 @@ public class Deck {
 	 * Load a standard deck of card
 	 */
 	private ArrayList<Card> loadDeck() {
-		ArrayList<Card> deck = new ArrayList<Card>();
+		ArrayList<Card> deck = new ArrayList<>();
 		addSuit(deck, Suit.CLUBS);
 		addSuit(deck, Suit.DIAMONDS);
 		addSuit(deck, Suit.HEARTS);
