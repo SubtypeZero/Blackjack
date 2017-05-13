@@ -24,6 +24,13 @@ public class Game implements Runnable {
 
 	private final int MAX_PLAYERS = 3;
 
+	/**
+	 * Create a new game instance
+	 * @param initBal the initial player balance
+	 * @param minBet the minimum bet amount
+	 * @param maxBet the maximum bet amount
+	 * @param decks the number of decks to use
+	 */
 	public Game(int initBal, int minBet, int maxBet, int decks) {
 		gson = new Gson();
 
@@ -114,10 +121,18 @@ public class Game implements Runnable {
 		// End of game
 	}
 
+	/**
+	 * Stop the game
+	 */
 	public void stop() {
 		running = false;
 	}
 
+	/**
+	 * Connect a new player to the game
+	 * @param clientSock the client's socket
+	 * @return true if the connection was successful
+	 */
 	public boolean connect(Socket clientSock) {
 		if (isOpen()) {
 			// First sits in middle, second sits on left, third sits on right
@@ -134,10 +149,18 @@ public class Game implements Runnable {
 		return false;
 	}
 
+	/**
+	 * Get the number of players in the game
+	 * @return the player count
+	 */
 	public int getPlayerCount() {
 		return players.size();
 	}
 
+	/**
+	 * Check if the game is open for players to join
+	 * @return the result
+	 */
 	public boolean isOpen() {
 		return getPlayerCount() < MAX_PLAYERS;
 	}

@@ -5,6 +5,11 @@ import java.net.Socket;
 
 public class Messenger {
 
+	/**
+	 * Send a message to the client
+	 * @param socket the client's socket
+	 * @param message the message to send
+	 */
 	public static void sendMessage(Socket socket, Message message) {
 		try {
 			DataOutputStream out = new DataOutputStream(socket.getOutputStream());
@@ -17,6 +22,11 @@ public class Messenger {
 		}
 	}
 
+	/**
+	 * Get a response from the client
+	 * @param socket the client's socket
+	 * @return a message from the client
+	 */
 	public static Message getResponse(Socket socket) {
 		try {
 			DataInputStream in = new DataInputStream(socket.getInputStream());

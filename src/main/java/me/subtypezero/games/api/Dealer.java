@@ -56,6 +56,10 @@ public class Dealer extends Gambler {
 		}
 	}
 
+	/**
+	 * Make the dealer take cards from the deck
+	 * @param amount the number of cards to take
+	 */
 	public void takeCards(int amount) {
 		for (int i = 0; i < amount; i++) {
 			hand.addCard(deck.takeCard());

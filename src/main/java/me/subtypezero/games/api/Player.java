@@ -72,6 +72,10 @@ public class Player extends Gambler {
 		}
 	}
 
+	/**
+	 * Get the client's socket
+	 * @return the socket
+	 */
 	public Socket getSocket() {
 		return socket;
 	}

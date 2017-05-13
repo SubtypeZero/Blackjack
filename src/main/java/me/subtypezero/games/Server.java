@@ -14,38 +14,38 @@ public class Server {
 
 	private final int MAX_GAMES;
 
+	/**
+	 * Create a game server
+	 * @param max the maximum number of games
+	 */
 	public Server(int max) {
 		this.MAX_GAMES =  max;
 		executor = Executors.newFixedThreadPool(MAX_GAMES);
+		games = new ArrayList<>(); // Create a list of Game sessions
 
-		// Create a list of Game sessions
-		games = new ArrayList<>();
-
-		// Create a server socket
 		try {
-			serverSocket = new ServerSocket(8103);
+			serverSocket = new ServerSocket(8103); // Create a server socket
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 
-		// Start accepting connections
 		start();
 	}
 
+	/**
+	 * Start accepting connections
+	 */
 	private void start() {
 		while (true) {
 			try {
 				Socket clientSock = serverSocket.accept();
-
-				// find available game
-				Game game = getOpenGame();
+				Game game = getOpenGame(); // find available game
 
 				if (game != null) {
-					// connect player to game
-					// game.connect(clientSock);
+					game.connect(clientSock); // connect player to game
 				}
 
-				// Server is full, send error message
+				// TODO send error message, server is full
 				clientSock.close();
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -53,13 +53,20 @@ public class Server {
 		}
 	}
 
+	/**
+	 * Stop all games and close the server
+	 */
 	public void stop() {
-		// for all games, stop
-		// wait for games to stop
-		// force games to stop
-		// close server
+		for (Game game : games) {
+			game.stop();
+		}
+		// TODO wait, force games to stop, close server
 	}
 
+	/**
+	 * Get an open game for players to join
+	 * @return an available game, null if server is full
+	 */
 	private Game getOpenGame() {
 		// Find first available game
 		for (Game game : games) {
@@ -70,7 +77,7 @@ public class Server {
 
 		// Create a new game
 		if (games.size() < MAX_GAMES) {
-			Game game = new Game(0, 0, 0, 0); // TODO Add real values
+			Game game = new Game(1000, 5, 100, 1);
 			executor.execute(game); // start the game
 			games.add(game);
 			return game;
