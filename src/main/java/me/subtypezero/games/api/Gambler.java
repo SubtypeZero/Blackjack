@@ -1,36 +1,19 @@
 package me.subtypezero.games.api;
 
 import me.subtypezero.games.api.card.Card;
+import me.subtypezero.games.api.card.Hand;
 
 import java.util.ArrayList;
 
 public class Gambler {
-	private ArrayList<Card> cards = new ArrayList<>();
+	Hand hand = new Hand();
 
 	/**
-	 * Get a list of the gambler's cards
-	 * @return the cards in the hand
+	 * Get the gambler's hand
+	 * @return the hand
 	 */
-	public ArrayList<Card> getCards() {
-		return (ArrayList<Card>) cards.clone();
-	}
-
-	/**
-	 * Add a card to the gambler's hand
-	 * @param card the card to add
-	 */
-	public void addCard(Card card) {
-		cards.add(card);
-	}
-
-	/**
-	 * Clear the gambler's hand
-	 * @return the cards from the hand
-	 */
-	public ArrayList<Card> clearCards() {
-		ArrayList<Card> cards = getCards();
-		this.cards.clear();
-		return cards;
+	public Hand getHand() {
+		return hand;
 	}
 
 	/**
@@ -44,7 +27,7 @@ public class Gambler {
 		int min = 0;
 		int max = 0;
 
-		for (Card card : cards) {
+		for (Card card : hand.getCards()) {
 			if (card.getValue() == 1) {
 				aces++;
 			}
