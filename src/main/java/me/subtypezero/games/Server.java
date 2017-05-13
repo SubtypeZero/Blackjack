@@ -1,5 +1,9 @@
 package me.subtypezero.games;
 
+import me.subtypezero.games.api.net.Message;
+import me.subtypezero.games.api.net.Messenger;
+import me.subtypezero.games.api.net.Type;
+
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -14,17 +18,22 @@ public class Server {
 
 	private final int MAX_GAMES;
 
+	public static void main(String[] args) {
+		new Server(8103, 5);
+	}
+
 	/**
 	 * Create a game server
 	 * @param max the maximum number of games
 	 */
-	public Server(int max) {
+	public Server(int port, int max) {
 		this.MAX_GAMES =  max;
 		executor = Executors.newFixedThreadPool(MAX_GAMES);
 		games = new ArrayList<>(); // Create a list of Game sessions
 
 		try {
-			serverSocket = new ServerSocket(8103); // Create a server socket
+			System.out.println("Starting BlackJack server on *:" + port);
+			serverSocket = new ServerSocket(port); // Create a server socket
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -43,9 +52,12 @@ public class Server {
 
 				if (game != null) {
 					game.connect(clientSock); // connect player to game
+					System.out.println("Client connected from " + clientSock.getInetAddress().getHostAddress());
+					continue;
 				}
 
-				// TODO send error message, server is full
+				// Server is full
+				Messenger.sendMessage(clientSock, new Message(Type.JOIN, "FULL"));
 				clientSock.close();
 			} catch (IOException e) {
 				e.printStackTrace();

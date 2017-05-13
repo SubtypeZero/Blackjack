@@ -135,15 +135,31 @@ public class Game implements Runnable {
 	 */
 	public boolean connect(Socket clientSock) {
 		if (isOpen()) {
-			// First sits in middle, second sits on left, third sits on right
-			if (getPlayerCount() < MAX_PLAYERS - 1) {
-				players.addLast(new Player(clientSock, INIT_BAL));
-			} else {
-				players.addFirst(new Player(clientSock, INIT_BAL));
-			}
-			// TODO Send server information to client
+			Player player = new Player(clientSock, INIT_BAL);
 
-			// TODO Ask the client to place a bet
+			// Tell the client they have been connected
+			Messenger.sendMessage(clientSock, new Message(Type.JOIN, "SUCCESS"));
+
+			// Ask the client to place a bet
+			Action actions = new Action();
+			actions.addAction(Type.BET);
+			Messenger.sendMessage(player.getSocket(), new Message(Type.ACTION, gson.toJson(actions)));
+
+			// Get response from client
+			Message reply = Messenger.getResponse(player.getSocket());
+
+			switch (reply.getType()) {
+				case Type.BET:
+					player.setBet(Integer.parseInt(reply.getData())); // Get the player's next bet
+					break;
+			}
+
+			// First player sits in middle, second sits on left, third sits on right
+			if (getPlayerCount() < MAX_PLAYERS - 1) {
+				players.addLast(player);
+			} else {
+				players.addFirst(player);
+			}
 			return true;
 		}
 		return false;
