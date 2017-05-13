@@ -9,7 +9,7 @@ import java.util.concurrent.Executors;
 
 public class Server {
 	private ServerSocket serverSocket;
-	private ArrayList<BlackJack> games;
+	private ArrayList<Game> games;
 	private ExecutorService executor;
 
 	private final int MAX_GAMES;
@@ -18,7 +18,7 @@ public class Server {
 		this.MAX_GAMES =  max;
 		executor = Executors.newFixedThreadPool(MAX_GAMES);
 
-		// Create a list of BlackJack sessions
+		// Create a list of Game sessions
 		games = new ArrayList<>();
 
 		// Create a server socket
@@ -38,7 +38,7 @@ public class Server {
 				Socket clientSock = serverSocket.accept();
 
 				// find available game
-				BlackJack game = getOpenGame();
+				Game game = getOpenGame();
 
 				if (game != null) {
 					// connect player to game
@@ -60,9 +60,9 @@ public class Server {
 		// close server
 	}
 
-	private BlackJack getOpenGame() {
+	private Game getOpenGame() {
 		// Find first available game
-		for (BlackJack game : games) {
+		for (Game game : games) {
 			if (game.isOpen()) {
 				return game;
 			}
@@ -70,7 +70,7 @@ public class Server {
 
 		// Create a new game
 		if (games.size() < MAX_GAMES) {
-			BlackJack game = new BlackJack(0, 0, 0, 0); // TODO Add real values
+			Game game = new Game(0, 0, 0, 0); // TODO Add real values
 			executor.execute(game); // start the game
 			games.add(game);
 			return game;

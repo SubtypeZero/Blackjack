@@ -1,7 +1,7 @@
 package me.subtypezero.games.api;
 
 import me.subtypezero.games.api.card.Deck;
-import me.subtypezero.games.api.event.Result;
+import me.subtypezero.games.api.net.Type;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -34,7 +34,7 @@ public class Dealer extends Gambler {
 
 			if (highest <= 16 || lowest <= 16) {
 				// draw a card
-				addCard(deck.takeCard());
+				hand.addCard(deck.takeCard());
 			} else {
 				done = true;
 			}
@@ -52,7 +52,13 @@ public class Dealer extends Gambler {
 		}
 
 		for (int i = 0; i < amount; i++) {
-			player.addCard(deck.takeCard());
+			player.getHand().addCard(deck.takeCard());
+		}
+	}
+
+	public void takeCards(int amount) {
+		for (int i = 0; i < amount; i++) {
+			hand.addCard(deck.takeCard());
 		}
 	}
 
@@ -61,7 +67,7 @@ public class Dealer extends Gambler {
 	 * @param player the player to compare with
 	 * @return the player's result
 	 */
-	public Result getResult(Player player) {
+	public int getResult(Player player) {
 		int dealerValue = getHighest(this.getHandValues());
 		int playerValue = getHighest(player.getHandValues());
 
@@ -70,23 +76,23 @@ public class Dealer extends Gambler {
 
 		// Check for bust
 		if (playerBust) {
-			return Result.LOSE;
+			return Type.LOSE;
 		} else if (dealerBust) {
-			return Result.WIN;
+			return Type.WIN;
 		}
 
 		// Check for push
 		if (dealerValue == playerValue) {
-			return Result.PUSH;
+			return Type.PUSH;
 		}
 
 		// Check hand value
 		if (playerValue == 21) {
-			return Result.BLACKJACK;
+			return Type.BLACKJACK;
 		} else if (playerValue > dealerValue) {
-			return Result.WIN;
+			return Type.WIN;
 		} else {
-			return Result.LOSE;
+			return Type.LOSE;
 		}
 	}
 

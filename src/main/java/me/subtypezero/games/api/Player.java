@@ -1,9 +1,12 @@
 package me.subtypezero.games.api;
 
-import me.subtypezero.games.api.event.Action;
+import com.google.gson.Gson;
+import me.subtypezero.games.api.net.Action;
+import me.subtypezero.games.api.net.Message;
+import me.subtypezero.games.api.net.Messenger;
+import me.subtypezero.games.api.net.Type;
 
 import java.net.Socket;
-import java.util.ArrayList;
 
 public class Player extends Gambler {
 	private Socket socket;
@@ -28,41 +31,49 @@ public class Player extends Gambler {
 			int highest = dealer.getHighest(getHandValues());
 			int lowest = dealer.getLowest(getHandValues());
 
-			ArrayList<Action> actions = new ArrayList<>();
+			Action actions = new Action();
 
 			if (highest < 0 && lowest > 21) {
 				return; // bust
 			}
 
 			// hit or stand
-			actions.add(Action.HIT);
-			actions.add(Action.STAND);
+			actions.addAction(Type.HIT);
+			actions.addAction(Type.STAND);
 
 			if (start) {
 				for (int value : getHandValues()) {
 					if (9 <= value && value <= 11) {
 						// double (only available on opening hand of 9 to 11)
-						actions.add(Action.DOUBLE);
+						actions.addAction(Type.DOUBLE);
 					}
 				}
 				start = false;
 			}
 
-			// TODO get response from client
-			Action action = null;
+			// Send actions to client
+			Gson gson = new Gson();
+			Messenger.sendMessage(socket, new Message(Type.ACTION, gson.toJson(actions)));
 
-			switch (action) {
-				case DOUBLE:
+			// Get response from client
+			Message msg = Messenger.getResponse(socket);
+
+			switch (msg.getType()) {
+				case Type.DOUBLE:
 					bet = bet * 2; // double the bet
 					break;
-				case HIT:
+				case Type.HIT:
 					dealer.dealCards(this, 1); // take another card
 					break;
-				case STAND:
+				case Type.STAND:
 					done = true;
 					break;
 			}
 		}
+	}
+
+	public Socket getSocket() {
+		return socket;
 	}
 
 	/**
