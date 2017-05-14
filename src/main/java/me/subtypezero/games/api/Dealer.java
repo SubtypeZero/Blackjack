@@ -1,5 +1,6 @@
 package me.subtypezero.games.api;
 
+import me.subtypezero.games.api.card.Card;
 import me.subtypezero.games.api.card.Deck;
 import me.subtypezero.games.api.net.Type;
 
@@ -63,6 +64,16 @@ public class Dealer extends Gambler {
 	public void takeCards(int amount) {
 		for (int i = 0; i < amount; i++) {
 			hand.addCard(deck.takeCard());
+		}
+	}
+
+	/**
+	 * Put cards back in the deck
+	 * @param cards cards to put back
+	 */
+	public void putCards(ArrayList<Card> cards) {
+		for (Card card : cards) {
+			deck.putCard(card);
 		}
 	}
 

@@ -1,20 +1,23 @@
 package me.subtypezero.games;
 
 import com.google.gson.Gson;
-import me.subtypezero.games.api.net.Action;
+import me.subtypezero.games.api.card.Card;
+import me.subtypezero.games.api.net.type.Action;
 import me.subtypezero.games.api.Dealer;
 import me.subtypezero.games.api.Player;
 import me.subtypezero.games.api.net.Message;
 import me.subtypezero.games.api.net.Messenger;
 import me.subtypezero.games.api.net.Type;
+import me.subtypezero.games.api.net.type.Update;
+import me.subtypezero.games.api.net.type.Value;
 
 import java.net.Socket;
-import java.util.LinkedList;
+import java.util.ArrayList;
 
 public class Game implements Runnable {
 	private Gson gson;
 
-	private LinkedList<Player> players;
+	private ArrayList<Player> players;
 	private Dealer dealer;
 	private boolean running = true;
 
@@ -34,7 +37,7 @@ public class Game implements Runnable {
 	public Game(int initBal, int minBet, int maxBet, int decks) {
 		gson = new Gson();
 
-		players = new LinkedList<>();
+		players = new ArrayList<>();
 		dealer = new Dealer(decks);
 
 		this.INIT_BAL = initBal;
@@ -45,80 +48,136 @@ public class Game implements Runnable {
 	public void run() {
 		while (running) {
 			// Get players
-			LinkedList<Player> players = (LinkedList<Player>) this.players.clone();
+			ArrayList<Player> players = (ArrayList<Player>) this.players.clone();
 
-			// Deal cards
-			for (Player player : players) {
-				dealer.dealCards(player, 2);
-			}
-			dealer.takeCards(2);
-
-			// Send hand data to clients
-			for (Player player : players) {
-				for (Player other : players) {
-					// Convert the other player's hand to JSON and send it to the client
-					Messenger.sendMessage(player.getSocket(), new Message(Type.HAND, gson.toJson(other.getHand())));
-				}
-				// Convert the dealer's hand to JSON and send it to the client
-				Messenger.sendMessage(player.getSocket(), new Message(Type.HAND, gson.toJson(dealer.getHand())));
-			}
+			// Deal cards to players
+			dealCards(players);
 
 			// Players take turns
-			for (Player player : players) {
-				player.takeTurn(dealer);
-				// TODO Send data to clients
-			}
-
-			// Dealer takes turn (card reveal can be handled by the client)
-			dealer.takeTurn();
+			takeTurns(players);
 
 			// Calculate results
-			for (Player player : players) {
-				int result = dealer.getResult(player);
-				int bet = player.getBet();
-				player.setBet(0);
+			showResults(players);
 
-				switch (result) {
-					case Type.WIN:
-						// return bet and give reward
-						player.giveMoney(bet * 2);
-						break;
-					case Type.LOSE:
-						// lose bet
-						break;
-					case Type.PUSH:
-						// return bet
-						player.giveMoney(bet);
-						break;
-					case Type.BLACKJACK:
-						// return bet and give bonus reward
-						player.giveMoney((int)(bet * 2.5));
-						break;
-				}
-
-				// Update client
-				String data = player.getBalance() + "," + player.getBet();
-				Messenger.sendMessage(player.getSocket(), new Message(result, data));
-
-				// Send actions to client
-				Action actions = new Action();
-				actions.addAction(Type.CLEAR);
-				actions.addAction(Type.REPEAT);
-
-				Messenger.sendMessage(player.getSocket(), new Message(Type.ACTION, gson.toJson(actions)));
-
-				// Get response from client
-				Message reply = Messenger.getResponse(player.getSocket());
-
-				switch (reply.getType()) {
-					case Type.CLEAR:
-					case Type.REPEAT:
-						player.setBet(Integer.parseInt(reply.getData())); // Get the player's next bet
-						break;
-				}
-			}
+			// Reset cards
+			resetCards(players);
 		}
-		// End of game
+
+		// Game closed, disconnect all players
+		for (Player player : players) {
+			Messenger.sendMessage(player.getSocket(), new Message(Type.LEAVE, "CLOSED"));
+		}
+	}
+
+	private void dealCards(ArrayList<Player> players) {
+		Update update = new Update();
+
+		// Deal cards
+		for (Player player : players) {
+			dealer.dealCards(player, 2);
+			update.addValue(new Value("HAND", player.getId(), player.getHand()));
+		}
+		dealer.takeCards(2);
+		update.addValue(new Value("HAND", "DEALER", dealer.getHand()));
+
+		// Send hand data to clients
+		sendData(players, Type.VALUE, update);
+	}
+
+	private void takeTurns(ArrayList<Player> players) {
+		Update update = new Update();
+
+		// Take turns
+		for (Player player : players) {
+			player.takeTurn(dealer);
+			update.addValue(new Value("HAND", player.getId(), player.getHand()));
+		}
+		dealer.takeTurn(); // Dealer goes last
+		update.addValue(new Value("HAND", "DEALER", dealer.getHand()));
+
+		// Send hand data to clients
+		sendData(players, Type.VALUE, update);
+	}
+
+	private void showResults(ArrayList<Player> players) {
+		Update update = new Update();
+
+		// Calculate results
+		for (Player player : players) {
+			int result = dealer.getResult(player);
+			int bet = player.getBet();
+			player.setBet(0);
+
+			switch (result) {
+				case Type.WIN:
+					// return bet and give reward
+					player.giveMoney(bet * 2);
+					break;
+				case Type.LOSE:
+					// lose bet
+					break;
+				case Type.PUSH:
+					// return bet
+					player.giveMoney(bet);
+					break;
+				case Type.BLACKJACK:
+					// return bet and give bonus reward
+					player.giveMoney((int)(bet * 2.5));
+					break;
+			}
+
+			// Update client
+			String data = player.getBalance() + "," + player.getBet();
+			Messenger.sendMessage(player.getSocket(), new Message(result, data));
+
+			// Send actions to client
+			Action actions = new Action();
+			actions.addAction(Type.CLEAR);
+			actions.addAction(Type.REPEAT);
+
+			Messenger.sendMessage(player.getSocket(), new Message(Type.ACTION, gson.toJson(actions)));
+
+			// Get response from client
+			Message reply = Messenger.getResponse(player.getSocket());
+
+			switch (reply.getType()) {
+				case Type.CLEAR:
+				case Type.REPEAT:
+					player.setBet(Integer.parseInt(reply.getData())); // Get the player's next bet
+					break;
+			}
+
+			// Tell other clients
+			update.addValue(new Value("BET", player.getId(), bet));
+		}
+
+		// Send bet data to clients
+		sendData(players, Type.VALUE, update);
+	}
+
+	private void resetCards(ArrayList<Player> players) {
+		ArrayList<Card> cards = new ArrayList<>();
+
+		for (Player player : players) {
+			cards.addAll(player.getHand().getCards());
+			player.getHand().clearCards();
+		}
+		cards.addAll(dealer.getHand().getCards());
+		dealer.getHand().clearCards();
+
+		dealer.putCards(cards);
+	}
+
+	/**
+	 * Send data to clients
+	 * @param players list of players
+	 * @param type type of message
+	 * @param data data to send
+	 */
+	private void sendData(ArrayList<Player> players, int type, Object data) {
+		for (Player player : players) {
+			Messenger.sendMessage(player.getSocket(), new Message(type, gson.toJson(data)));
+		}
 	}
 
 	/**
@@ -155,11 +214,7 @@ public class Game implements Runnable {
 			}
 
 			// First player sits in middle, second sits on left, third sits on right
-			if (getPlayerCount() < MAX_PLAYERS - 1) {
-				players.addLast(player);
-			} else {
-				players.addFirst(player);
-			}
+			players.add(player);
 			return true;
 		}
 		return false;
