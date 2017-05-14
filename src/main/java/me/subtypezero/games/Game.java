@@ -47,20 +47,12 @@ public class Game implements Runnable {
 
 	public void run() {
 		while (running) {
-			// Get players
-			ArrayList<Player> players = (ArrayList<Player>) this.players.clone();
+			ArrayList<Player> players = (ArrayList<Player>) this.players.clone(); // Get players
 
-			// Deal cards to players
-			dealCards(players);
-
-			// Players take turns
-			takeTurns(players);
-
-			// Calculate results
-			showResults(players);
-
-			// Reset cards
-			resetCards(players);
+			dealCards(players); // Deal cards
+			takeTurns(players); // Take turns
+			showResults(players); // Calculate results
+			resetCards(players); // Reset cards
 		}
 
 		// Game closed, disconnect all players
