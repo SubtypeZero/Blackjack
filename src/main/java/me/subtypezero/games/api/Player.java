@@ -1,15 +1,17 @@
 package me.subtypezero.games.api;
 
 import com.google.gson.Gson;
-import me.subtypezero.games.api.net.Action;
+import me.subtypezero.games.api.net.type.Action;
 import me.subtypezero.games.api.net.Message;
 import me.subtypezero.games.api.net.Messenger;
 import me.subtypezero.games.api.net.Type;
 
 import java.net.Socket;
+import java.util.UUID;
 
 public class Player extends Gambler {
 	private Socket socket;
+	private final String uuid;
 	private int balance;
 	private int bet;
 
@@ -20,6 +22,7 @@ public class Player extends Gambler {
 	 */
 	public Player(Socket socket, int balance) {
 		this.socket = socket;
+		this.uuid = UUID.randomUUID().toString();
 		this.balance = balance;
 	}
 
@@ -78,6 +81,14 @@ public class Player extends Gambler {
 	 */
 	public Socket getSocket() {
 		return socket;
+	}
+
+	/**
+	 * Get the player's UUID
+	 * @return the id
+	 */
+	public String getId() {
+		return uuid;
 	}
 
 	/**
