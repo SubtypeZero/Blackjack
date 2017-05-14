@@ -1,4 +1,4 @@
-package me.subtypezero.games.api.net;
+package me.subtypezero.games.api.net.type;
 
 import java.util.ArrayList;
 
