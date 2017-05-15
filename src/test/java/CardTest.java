@@ -11,8 +11,8 @@ public class CardTest {
 		Card ace = new Card(Suit.SPADES, 1);
 		assertEquals(Suit.SPADES, ace.getSuit());
 
-		Card king = new Card(Suit.DIAMONDS, 12);
-		assertEquals(12, king.getValue());
+		Card king = new Card(Suit.DIAMONDS, 13);
+		assertEquals(13, king.getValue());
 		assertEquals(10, king.getFaceValue());
 	}
 }
