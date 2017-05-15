@@ -1,4 +1,4 @@
-package me.subtypezero.games.api;
+package me.subtypezero.games.server.entity;
 
 import me.subtypezero.games.api.card.Card;
 import me.subtypezero.games.api.card.Hand;

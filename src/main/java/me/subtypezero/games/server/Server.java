@@ -1,4 +1,4 @@
-package me.subtypezero.games;
+package me.subtypezero.games.server;
 
 import me.subtypezero.games.api.net.Message;
 import me.subtypezero.games.api.net.Messenger;

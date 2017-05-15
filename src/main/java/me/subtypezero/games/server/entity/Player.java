@@ -1,4 +1,4 @@
-package me.subtypezero.games.api;
+package me.subtypezero.games.server.entity;
 
 import com.google.gson.Gson;
 import me.subtypezero.games.api.net.type.Action;

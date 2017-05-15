@@ -1,10 +1,10 @@
-package me.subtypezero.games;
+package me.subtypezero.games.server;
 
 import com.google.gson.Gson;
 import me.subtypezero.games.api.card.Card;
 import me.subtypezero.games.api.net.type.Action;
-import me.subtypezero.games.api.Dealer;
-import me.subtypezero.games.api.Player;
+import me.subtypezero.games.server.entity.Dealer;
+import me.subtypezero.games.server.entity.Player;
 import me.subtypezero.games.api.net.Message;
 import me.subtypezero.games.api.net.Messenger;
 import me.subtypezero.games.api.net.Type;
@@ -151,13 +151,11 @@ public class Game implements Runnable {
 		ArrayList<Card> cards = new ArrayList<>();
 
 		for (Player player : players) {
-			cards.addAll(player.getHand().getCards());
-			player.getHand().clearCards();
+			cards.addAll(player.getHand().clearCards()); // Take cards from all players
 		}
-		cards.addAll(dealer.getHand().getCards());
-		dealer.getHand().clearCards();
+		cards.addAll(dealer.getHand().clearCards()); // Take cards from the dealer
 
-		dealer.putCards(cards);
+		dealer.putCards(cards); // Put cards back in the deck
 	}
 
 	/**
