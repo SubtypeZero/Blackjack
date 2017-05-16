@@ -2,10 +2,11 @@ package me.subtypezero.games.server.entity;
 
 import com.google.gson.Gson;
 import me.subtypezero.games.api.entity.Gambler;
-import me.subtypezero.games.api.net.type.Action;
 import me.subtypezero.games.api.net.Message;
 import me.subtypezero.games.api.net.Messenger;
 import me.subtypezero.games.api.net.Type;
+import me.subtypezero.games.api.net.type.Update;
+import me.subtypezero.games.api.net.type.Value;
 
 import java.net.Socket;
 import java.util.UUID;
@@ -35,29 +36,26 @@ public class Player extends Gambler {
 			int highest = dealer.getHighest(getHandValues());
 			int lowest = dealer.getLowest(getHandValues());
 
-			Action actions = new Action();
+			Update update = new Update();
 
 			if (highest < 0 && lowest > 21) {
-				return; // bust
-			}
-
-			// hit or stand
-			actions.addAction(Type.HIT);
-			actions.addAction(Type.STAND);
-
-			if (start) {
-				for (int value : getHandValues()) {
-					if (9 <= value && value <= 11) {
-						// double (only available on opening hand of 9 to 11)
-						actions.addAction(Type.DOUBLE);
+				update.addValue(new Value("ACTION", "", null)); // Bust, no options
+			} else {
+				if (start) {
+					for (int value : getHandValues()) {
+						if (9 <= value && value <= 11) {
+							update.addValue(new Value("ACTION", "", "DOUBLE")); // Available on opening hand value from 9 to 11
+						}
 					}
+					start = false;
 				}
-				start = false;
+				update.addValue(new Value("ACTION", "", "HIT"));
+				update.addValue(new Value("ACTION", "", "STAND"));
 			}
 
-			// Send actions to client
+			// Send options to client
 			Gson gson = new Gson();
-			Messenger.sendMessage(socket, new Message(Type.ACTION, gson.toJson(actions)));
+			Messenger.sendMessage(socket, new Message(Type.UPDATE, gson.toJson(update)));
 
 			// Get response from client
 			Message msg = Messenger.getResponse(socket);
