@@ -2,7 +2,7 @@ package me.subtypezero.games.server;
 
 import me.subtypezero.games.api.net.Message;
 import me.subtypezero.games.api.net.Messenger;
-import me.subtypezero.games.api.net.Type;
+import me.subtypezero.games.api.net.update.Type;
 
 import java.io.IOException;
 import java.net.ServerSocket;

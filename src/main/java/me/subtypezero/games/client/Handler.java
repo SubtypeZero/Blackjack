@@ -2,7 +2,7 @@ package me.subtypezero.games.client;
 
 import me.subtypezero.games.api.net.Message;
 import me.subtypezero.games.api.net.Messenger;
-import me.subtypezero.games.api.net.Type;
+import me.subtypezero.games.api.net.update.Type;
 import me.subtypezero.games.client.entity.Player;
 
 public class Handler implements Runnable {

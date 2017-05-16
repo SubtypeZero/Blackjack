@@ -1,4 +1,4 @@
-package me.subtypezero.games.api.net;
+package me.subtypezero.games.api.net.update;
 
 public class Type {
 	// Update

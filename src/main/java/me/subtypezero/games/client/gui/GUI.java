@@ -6,7 +6,7 @@ import javafx.scene.control.Button;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import me.subtypezero.games.api.card.Card;
-import me.subtypezero.games.api.net.Type;
+import me.subtypezero.games.api.net.update.Type;
 import me.subtypezero.games.client.Client;
 
 public class GUI extends BorderPane {

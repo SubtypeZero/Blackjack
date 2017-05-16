@@ -4,9 +4,9 @@ import com.google.gson.Gson;
 import me.subtypezero.games.api.entity.Gambler;
 import me.subtypezero.games.api.net.Message;
 import me.subtypezero.games.api.net.Messenger;
-import me.subtypezero.games.api.net.Type;
-import me.subtypezero.games.api.net.type.Update;
-import me.subtypezero.games.api.net.type.Value;
+import me.subtypezero.games.api.net.update.Type;
+import me.subtypezero.games.api.net.update.Update;
+import me.subtypezero.games.api.net.update.Value;
 
 import java.net.Socket;
 import java.util.UUID;

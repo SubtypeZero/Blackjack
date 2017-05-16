@@ -1,4 +1,4 @@
-package me.subtypezero.games.api.net.type;
+package me.subtypezero.games.api.net.update;
 
 public class Value {
 	private String type;

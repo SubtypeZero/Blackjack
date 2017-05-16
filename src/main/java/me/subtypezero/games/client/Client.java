@@ -3,7 +3,7 @@ package me.subtypezero.games.client;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
-import me.subtypezero.games.api.net.Type;
+import me.subtypezero.games.api.net.update.Type;
 import me.subtypezero.games.client.gui.GUI;
 import me.subtypezero.games.client.gui.Dialog;
 

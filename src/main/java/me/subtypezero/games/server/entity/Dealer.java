@@ -3,7 +3,7 @@ package me.subtypezero.games.server.entity;
 import me.subtypezero.games.api.card.Card;
 import me.subtypezero.games.api.card.Deck;
 import me.subtypezero.games.api.entity.Gambler;
-import me.subtypezero.games.api.net.Type;
+import me.subtypezero.games.api.net.update.Type;
 
 import java.util.ArrayList;
 import java.util.Collections;
