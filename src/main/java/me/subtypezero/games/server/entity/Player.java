@@ -1,6 +1,7 @@
 package me.subtypezero.games.server.entity;
 
 import com.google.gson.Gson;
+import me.subtypezero.games.api.entity.Gambler;
 import me.subtypezero.games.api.net.type.Action;
 import me.subtypezero.games.api.net.Message;
 import me.subtypezero.games.api.net.Messenger;

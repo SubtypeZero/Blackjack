@@ -2,6 +2,7 @@ package me.subtypezero.games.server.entity;
 
 import me.subtypezero.games.api.card.Card;
 import me.subtypezero.games.api.card.Deck;
+import me.subtypezero.games.api.entity.Gambler;
 import me.subtypezero.games.api.net.Type;
 
 import java.util.ArrayList;
@@ -35,7 +36,7 @@ public class Dealer extends Gambler {
 
 			if (highest <= 16 || lowest <= 16) {
 				// draw a card
-				hand.addCard(deck.takeCard());
+				getHand().addCard(deck.takeCard());
 			} else {
 				done = true;
 			}
@@ -63,7 +64,7 @@ public class Dealer extends Gambler {
 	 */
 	public void takeCards(int amount) {
 		for (int i = 0; i < amount; i++) {
-			hand.addCard(deck.takeCard());
+			getHand().addCard(deck.takeCard());
 		}
 	}
 

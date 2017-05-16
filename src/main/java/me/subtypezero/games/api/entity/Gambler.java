@@ -1,4 +1,4 @@
-package me.subtypezero.games.server.entity;
+package me.subtypezero.games.api.entity;
 
 import me.subtypezero.games.api.card.Card;
 import me.subtypezero.games.api.card.Hand;
@@ -6,7 +6,7 @@ import me.subtypezero.games.api.card.Hand;
 import java.util.ArrayList;
 
 public class Gambler {
-	Hand hand = new Hand();
+	private Hand hand = new Hand();
 
 	/**
 	 * Get the gambler's hand
