@@ -124,8 +124,8 @@ public class Game implements Runnable {
 
 			// Send actions to client
 			Action actions = new Action();
+			actions.addAction(Type.DEAL);
 			actions.addAction(Type.CLEAR);
-			actions.addAction(Type.REPEAT);
 
 			Messenger.sendMessage(player.getSocket(), new Message(Type.ACTION, gson.toJson(actions)));
 
@@ -133,8 +133,8 @@ public class Game implements Runnable {
 			Message reply = Messenger.getResponse(player.getSocket());
 
 			switch (reply.getType()) {
+				case Type.DEAL:
 				case Type.CLEAR:
-				case Type.REPEAT:
 					player.setBet(Integer.parseInt(reply.getData())); // Get the player's next bet
 					break;
 			}

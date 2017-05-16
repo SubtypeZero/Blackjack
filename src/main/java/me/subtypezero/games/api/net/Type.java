@@ -14,11 +14,10 @@ public class Type {
 	public static final int DOUBLE = 8;
 	public static final int HIT = 9;
 	public static final int STAND = 10;
-	public static final int REPEAT = 11;
 
 	// Result
-	public static final int WIN = 12;
-	public static final int LOSE = 13;
-	public static final int PUSH = 14;
-	public static final int BLACKJACK = 15;
+	public static final int WIN = 11;
+	public static final int LOSE = 12;
+	public static final int PUSH = 13;
+	public static final int BLACKJACK = 14;
 }
