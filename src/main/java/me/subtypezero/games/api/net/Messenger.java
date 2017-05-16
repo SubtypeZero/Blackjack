@@ -16,7 +16,6 @@ public class Messenger {
 			out.writeByte(message.getType()); // Write message type
 			out.writeUTF(message.getData()); // Write data
 			out.flush();
-			out.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
