@@ -1,4 +1,4 @@
-package me.subtypezero.games.client.pane;
+package me.subtypezero.games.client.gui;
 
 import javafx.geometry.Rectangle2D;
 import javafx.scene.image.Image;

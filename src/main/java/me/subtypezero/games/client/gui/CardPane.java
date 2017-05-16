@@ -1,4 +1,4 @@
-package me.subtypezero.games.client.pane;
+package me.subtypezero.games.client.gui;
 
 import javafx.scene.control.TitledPane;
 import javafx.scene.layout.Pane;

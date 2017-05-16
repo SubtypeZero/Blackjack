@@ -1,4 +1,4 @@
-package me.subtypezero.games.client;
+package me.subtypezero.games.client.gui;
 
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -7,12 +7,12 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import me.subtypezero.games.api.card.Card;
 import me.subtypezero.games.api.net.Type;
-import me.subtypezero.games.client.pane.CardPane;
+import me.subtypezero.games.client.Client;
 
 public class GUI extends BorderPane {
-	Client client;
-	HBox gamePane;
-	HBox optionPane;
+	private Client client;
+	private HBox gamePane;
+	private HBox optionPane;
 
 	public GUI(Client client) {
 		this.client = client;
