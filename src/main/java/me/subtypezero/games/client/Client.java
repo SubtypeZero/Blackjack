@@ -1,69 +1,90 @@
 package me.subtypezero.games.client;
 
 import javafx.application.Application;
-import javafx.geometry.Insets;
-import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
-import me.subtypezero.games.api.card.Card;
-import me.subtypezero.games.api.card.Suit;
-import me.subtypezero.games.client.gui.CardPane;
+import me.subtypezero.games.api.net.Type;
+import me.subtypezero.games.client.gui.GUI;
+import me.subtypezero.games.client.gui.Dialog;
+
+import java.io.IOException;
+import java.net.Socket;
 
 public class Client extends Application {
+	private Socket socket;
+	private GUI game;
+	private Dialog dialog;
+
+	public static void main(String[] args) {
+		launch(args);
+	}
 
 	@Override
 	public void start(Stage primaryStage) {
-		BorderPane borderPane = new BorderPane();
-		HBox gamePane = new HBox();
+		boolean connected = connect("localhost", 8103);
 
-		// Player panes
-		CardPane dealer = new CardPane("Dealer");
-		dealer.addCard(new Card(Suit.SPADES, 1));
-		dealer.addCard(new Card(Suit.HEARTS, 12));
-		dealer.addCard(new Card(Suit.CLUBS, 13));
-		dealer.addCard(new Card(Suit.DIAMONDS, 10));
+		if (!connected) {
+			System.out.println("Connection to server failed, closing application");
+			System.exit(-1);
+		}
 
-		CardPane player1 = new CardPane("Player 1");
-		CardPane player2 = new CardPane("Player 2");
-		CardPane player3 = new CardPane("Player 3");
+		game = new GUI(this);
 
-		gamePane.getChildren().add(dealer);
-		gamePane.getChildren().add(player1);
-		gamePane.getChildren().add(player2);
-		gamePane.getChildren().add(player3);
+		Handler handler = new Handler(this);
+		dialog = new Dialog(handler);
+		new Thread(handler).start();
 
-		borderPane.setCenter(gamePane);
-
-
-		// Buttons (double, hit, stand)
-		HBox options = new HBox(10);
-		options.setPadding(new Insets(10));
-		options.setAlignment(Pos.CENTER);
-
-		Button btnDouble = new Button("Double");
-		Button btnHit = new Button("Hit");
-		Button btnStand = new Button("Stand");
-
-		options.getChildren().add(btnDouble);
-		options.getChildren().add(btnHit);
-		options.getChildren().add(btnStand);
-
-		borderPane.setBottom(options);
-
-
-		Scene scene = new Scene(borderPane, 362, 382);
+		Scene scene = new Scene(game, 362, 382);
 		scene.getStylesheets().add("style.css");
 
 		primaryStage.setTitle("Blackjack");
 		primaryStage.setResizable(false);
 		primaryStage.setScene(scene);
 		primaryStage.show();
+		dialog.show();
 	}
 
-	public static void main(String[] args) {
-		launch(args);
+	public void onAction(int type) {
+		switch (type) {
+			case Type.DEAL:
+				break;
+			case Type.CLEAR:
+				dialog.show();
+				break;
+			case Type.DOUBLE:
+				break;
+			case Type.HIT:
+				break;
+			case Type.STAND:
+				break;
+		}
+	}
+
+	private boolean connect(String host, int port) {
+		boolean connected = false;
+		int count = 0;
+
+		while (!connected && count < 3) {
+			try {
+				count++;
+				socket = new Socket(host, port);
+				connected = true;
+			} catch (IOException ex) {
+				try {
+					Thread.sleep(5000);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+		return connected;
+	}
+
+	public Socket getSocket() {
+		return socket;
+	}
+
+	public GUI getGame() {
+		return game;
 	}
 }
