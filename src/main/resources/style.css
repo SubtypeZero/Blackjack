@@ -1,4 +1,12 @@
 .root{
-    -fx-base: rgb(4, 59, 25);
-    -fx-background: rgb(17, 116, 46);
+    -fx-base: #043B19;
+    -fx-background: #11742E;
+}
+
+.button {
+    -fx-focus-color: #043B19;
+}
+
+.titled-pane {
+    -fx-box-border: #043B19;
 }
