@@ -4,7 +4,7 @@ import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import me.subtypezero.games.api.net.update.Type;
-import me.subtypezero.games.client.gui.GUI;
+import me.subtypezero.games.client.gui.Display;
 import me.subtypezero.games.client.gui.Dialog;
 
 import java.io.IOException;
@@ -12,8 +12,10 @@ import java.net.Socket;
 
 public class Client extends Application {
 	private Socket socket;
-	private GUI game;
+	private Display display;
+	private Handler handler;
 	private Dialog dialog;
+	private String id;
 
 	public static void main(String[] args) {
 		launch(args);
@@ -28,19 +30,26 @@ public class Client extends Application {
 			System.exit(-1);
 		}
 
-		game = new GUI(this);
-
-		Handler handler = new Handler(this);
+		display = new Display(this);
+		handler = new Handler(this);
 		dialog = new Dialog(handler);
 		new Thread(handler).start();
 
-		Scene scene = new Scene(game, 362, 382);
+		Scene scene = new Scene(display, 362, 382);
 		scene.getStylesheets().add("style.css");
 
 		primaryStage.setTitle("Blackjack");
 		primaryStage.setResizable(false);
 		primaryStage.setScene(scene);
 		primaryStage.show();
+
+		while (handler.getMinBet() == 0) {
+			try {
+				Thread.sleep(100);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
 		dialog.show();
 	}
 
@@ -84,7 +93,15 @@ public class Client extends Application {
 		return socket;
 	}
 
-	public GUI getGame() {
-		return game;
+	public Display getDisplay() {
+		return display;
+	}
+
+	public String getId() {
+		return id;
+	}
+
+	public void setId(String id) {
+		this.id = id;
 	}
 }

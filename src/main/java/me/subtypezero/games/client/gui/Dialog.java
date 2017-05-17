@@ -40,7 +40,7 @@ public class Dialog extends BorderPane {
 		buttonPane.setPadding(new Insets(5));
 
 		Button submit = new Button("Submit");
-		submit.setOnAction(e -> stage.close());
+		submit.setOnAction(e -> setBet());
 		buttonPane.getChildren().add(submit);
 
 		HBox addPane = new HBox(5);
@@ -87,6 +87,8 @@ public class Dialog extends BorderPane {
 		stage.setTitle("Place your bet!");
 		stage.setResizable(false);
 		stage.initModality(Modality.APPLICATION_MODAL); // Make the stage pop up
+
+
 	}
 
 	private void add(int value) {
@@ -101,5 +103,10 @@ public class Dialog extends BorderPane {
 
 	public void show() {
 		stage.showAndWait();
+	}
+
+	private void setBet() {
+		handler.setBetPlaced(true);
+		stage.close();
 	}
 }

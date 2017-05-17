@@ -9,12 +9,14 @@ import me.subtypezero.games.api.card.Card;
 import me.subtypezero.games.api.net.update.Type;
 import me.subtypezero.games.client.Client;
 
-public class GUI extends BorderPane {
+import java.util.ArrayList;
+
+public class Display extends BorderPane {
 	private Client client;
 	private HBox gamePane;
 	private HBox optionPane;
 
-	public GUI(Client client) {
+	public Display(Client client) {
 		this.client = client;
 
 		gamePane = new HBox();
@@ -79,6 +81,12 @@ public class GUI extends BorderPane {
 
 	public void addCard(int index, Card card) {
 		getCardPane(index).addCard(card);
+	}
+
+	public void setCards(int index, ArrayList<Card> cards) {
+		for (Card card : cards) {
+			addCard(index, card);
+		}
 	}
 
 	public void clearCards(int index) {
