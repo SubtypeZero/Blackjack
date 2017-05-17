@@ -39,18 +39,16 @@ public class Player extends Gambler {
 			Update update = new Update();
 
 			if (highest < 0 && lowest > 21) {
-				update.addValue(new Value("ACTION", "", null)); // Bust, no options
-			} else {
-				if (start) {
-					for (int value : getHandValues()) {
-						if (9 <= value && value <= 11) {
-							update.addValue(new Value("ACTION", "", "DOUBLE")); // Available on opening hand value from 9 to 11
-						}
+				update.addValue(new Value("ACTION", "", "BUST")); // Bust, no options
+			} else if (start) {
+				for (int value : getHandValues()) {
+					if (9 <= value && value <= 11) {
+						update.addValue(new Value("ACTION", "", "DOUBLE")); // Available on opening hand value from 9 to 11
 					}
-					start = false;
 				}
-				update.addValue(new Value("ACTION", "", "HIT"));
-				update.addValue(new Value("ACTION", "", "STAND"));
+				start = false;
+			} else {
+				update.addValue(new Value("ACTION", "", "NORMAL"));
 			}
 
 			// Send options to client

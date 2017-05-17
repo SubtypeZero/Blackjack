@@ -13,14 +13,13 @@ import me.subtypezero.games.client.entity.Player;
 
 import java.util.ArrayList;
 
-public class Handler implements Runnable {
+public class Handler extends Thread {
 	private Gson gson;
 
 	private Client client;
 	private ArrayList<String> clientIds;
 	private ArrayList<Player> players; // 0 = Dealer, 1 = Client
 	private boolean running;
-	private boolean betPlaced;
 
 	private int initBal;
 	private int minBet;
@@ -34,61 +33,37 @@ public class Handler implements Runnable {
 		running = true;
 	}
 
-	private void start() {
+	private void init() {
 		Message msg = getMessage();
 
 		if (msg.getType() == Type.JOIN) {
-			switch (msg.getData()) {
-				case "FULL":
-					System.out.println("Server is full, closing application");
-					System.exit(0);
-					break;
-				default:
-					Update update = getUpdate(msg.getData());
-					client.setId(update.getValue("ID").getId());
-					initBal = (int)(double) update.getValue("BALANCE").getData(); // The value is received as a double, JSON issue?
-					System.out.println("Connected to server!");
-					break;
+			if (msg.getData().equals("FULL")) {
+				System.out.println("Server is full, closing application");
+				System.exit(0);
 			}
+
+			Update info = getUpdate(msg.getData());
+
+			client.setId(info.getValue("ID").getId());
+			initBal = (int)(double) info.getValue("BALANCE").getData(); // The value is received as a double, JSON issue?
+			minBet = (int)(double) info.getValue("MIN").getData();
+			maxBet = (int)(double) info.getValue("MAX").getData();
+			System.out.println("Connected to server!");
 		}
 	}
 
 	public void run() {
-		start();
+		init(); // Get server info
+		clearTable(); // Clear table and get bet
 
 		while(running) {
 			startRound(); // Start round
-			dealCards(); // Deal cards
-			takeTurns(); // Take turns
-			showResults(); // Show results
-			// TODO resetTable(); // Reset table
 		}
 	}
 
 	private void startRound() {
-		clientIds.add("DEALER");
-		clientIds.add(client.getId());
-		players.add(new Player("DEALER", -1));
-		players.add(new Player(client.getId(), initBal));
-
-		Message info = getMessage(); // Get game info
-
-		if (info.getType() == Type.DEAL) {
-			Update update = getUpdate(info.getData());
-			minBet = Integer.parseInt((String) update.getValue("MIN").getData());
-			maxBet = Integer.parseInt((String) update.getValue("MAX").getData());
-
-			while (!betPlaced) {
-				try {
-					Thread.sleep(100);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-			}
-			Messenger.sendMessage(client.getSocket(), new Message(Type.BET, "" + getBet())); // Send bet to server
-		}
-
-		info = getMessage(); // Get player info
+		System.out.println("Starting round");
+		Message info = getMessage(); // Get player info
 
 		if (info.getType() == Type.UPDATE) {
 			Update update = getUpdate(info.getData());
@@ -114,12 +89,22 @@ public class Handler implements Runnable {
 							player.setBet(Integer.parseInt((String) value.getData()));
 						}
 						break;
+					case "BALANCE":
+						// TODO Add this feature so balance doesn't reset every round
+						break;
 				}
 			}
 		}
+
+		System.out.println("Waiting...");
+		suspend();
+		System.out.println("Dealing cards");
+		dealCards();
 	}
 
 	private void dealCards() {
+		System.out.println("Dealing cards");
+		Messenger.sendMessage(client.getSocket(), new Message(Type.BET, "" + getBet())); // Send bet to server
 		Message info = getMessage();
 
 		if (info.getType() == Type.UPDATE) {
@@ -132,22 +117,72 @@ public class Handler implements Runnable {
 			}
 		}
 		updateCards(); // Update the display
+		takeTurns();
 	}
 
 	private void takeTurns() {
+		boolean done = false;
 
+		while (!done) {
+			Message msg = getMessage();
+
+			if (msg.getType() == Type.UPDATE) {
+				Update update = getUpdate(msg.getData());
+
+				String action = (String) update.getValues().get(0).getData(); // TODO Fix null pointer exception
+
+				Platform.runLater(new Runnable() {
+					@Override
+					public void run() {
+
+						switch (action) {
+							case "DOUBLE":
+								// double, hit, stand
+								client.getDisplay().showActions(true);
+								break;
+							case "NORMAL":
+								// hit, stand
+								client.getDisplay().showActions(false);
+								break;
+							case "BUST":
+								// bust
+								client.getDisplay().showOptions();
+								break;
+						}
+					}
+				});
+
+				// TODO Wait for selection, send choice to server (double, hit, stand)
+				// Messenger.sendMessage(client.getSocket(), new Message(Type.STAND, null));
+			}
+		}
+		showResults();
 	}
 
 	private void showResults() {
 
 	}
 
-	private void resetTable() {
-		System.out.println("Resetting table");
-		clearTable();
+	public void clearTable() {
+		System.out.println("Clearing table");
+		clearCards();
 		clientIds.clear();
 		players.clear();
-		betPlaced = false;
+
+		clientIds.add("DEALER");
+		clientIds.add(client.getId());
+		players.add(new Player("DEALER", -1));
+		players.add(new Player(client.getId(), initBal));
+
+		// Have client place bet
+		Platform.runLater(new Runnable() {
+			@Override
+			public void run() {
+				client.showDialog();
+			}
+		});
+		suspend();
+		Messenger.sendMessage(client.getSocket(), new Message(Type.BET, "" + getBet())); // Send bet to server
 	}
 
 	/**
@@ -223,7 +258,7 @@ public class Handler implements Runnable {
 	/**
 	 * Clear all cards in the display
 	 */
-	private void clearTable() {
+	private void clearCards() {
 		Platform.runLater(new Runnable() {
 			@Override
 			public void run() {
@@ -232,10 +267,6 @@ public class Handler implements Runnable {
 				}
 			}
 		});
-	}
-
-	public void setBetPlaced(boolean betPlaced) {
-		this.betPlaced = betPlaced;
 	}
 
 	/**

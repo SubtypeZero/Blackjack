@@ -87,8 +87,6 @@ public class Dialog extends BorderPane {
 		stage.setTitle("Place your bet!");
 		stage.setResizable(false);
 		stage.initModality(Modality.APPLICATION_MODAL); // Make the stage pop up
-
-
 	}
 
 	private void add(int value) {
@@ -106,7 +104,7 @@ public class Dialog extends BorderPane {
 	}
 
 	private void setBet() {
-		handler.setBetPlaced(true);
 		stage.close();
+		handler.resume();
 	}
 }

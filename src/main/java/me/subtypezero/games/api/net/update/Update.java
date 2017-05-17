@@ -27,7 +27,7 @@ public class Update {
 	 */
 	public Value getValue(String type) {
 		for (Value value : values) {
-			if (type.equals(value.getType())) {
+			if (value.getType().equals(type)) {
 				return value;
 			}
 		}

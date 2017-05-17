@@ -63,7 +63,7 @@ public class Game implements Runnable {
 			}
 		}
 
-		// Game closed, disconnect all players
+		// TODO Close game and disconnect all players
 		for (Player player : players) {
 			Messenger.sendMessage(player.getSocket(), new Message(Type.LEAVE, "CLOSED"));
 		}
@@ -74,11 +74,6 @@ public class Game implements Runnable {
 		Update update = new Update();
 
 		for (Player player : players) {
-			Update info = new Update();
-			info.addValue(new Value("MIN", "", "" + MIN_BET));
-			info.addValue(new Value("MAX", "", "" + MAX_BET));
-			Messenger.sendMessage(player.getSocket(), new Message(Type.DEAL, gson.toJson(info))); // Ask client to bet
-
 			Message reply = Messenger.getResponse(player.getSocket()); // Get bet from client
 
 			switch (reply.getType()) {
@@ -89,7 +84,7 @@ public class Game implements Runnable {
 			update.addValue(new Value("ID", player.getId(), null)); // Add UUID to update
 			update.addValue(new Value("BET", player.getId(), player.getBet())); // Add bet to update
 		}
-		sendUpdate(players, update); // Send round data to clients
+		sendUpdate(players, update); // Send player data to clients
 	}
 
 	private void dealCards(ArrayList<Player> players) {
@@ -186,7 +181,7 @@ public class Game implements Runnable {
 	 * @param clientSock the client's socket
 	 * @return true if the connection was successful
 	 */
-	public synchronized boolean connect(Socket clientSock) {
+	public boolean connect(Socket clientSock) {
 		if (isOpen()) {
 			Player player = new Player(clientSock, INIT_BAL);
 			players.add(player);
@@ -194,7 +189,9 @@ public class Game implements Runnable {
 			// The client has been connected, send their UUID
 			Update update = new Update();
 			update.addValue(new Value("ID", player.getId(), null));
-			update.addValue(new Value("BALANCE", player.getId(), player.getBalance()));
+			update.addValue(new Value("BALANCE", "", player.getBalance()));
+			update.addValue(new Value("MIN", "", MIN_BET));
+			update.addValue(new Value("MAX", "", MAX_BET));
 			Messenger.sendMessage(clientSock, new Message(Type.JOIN, gson.toJson(update)));
 			return true;
 		}

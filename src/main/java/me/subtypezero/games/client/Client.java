@@ -33,7 +33,7 @@ public class Client extends Application {
 		display = new Display(this);
 		handler = new Handler(this);
 		dialog = new Dialog(handler);
-		new Thread(handler).start();
+		handler.start();
 
 		Scene scene = new Scene(display, 362, 382);
 		scene.getStylesheets().add("style.css");
@@ -42,20 +42,13 @@ public class Client extends Application {
 		primaryStage.setResizable(false);
 		primaryStage.setScene(scene);
 		primaryStage.show();
-
-		while (handler.getMinBet() == 0) {
-			try {
-				Thread.sleep(100);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-		}
-		dialog.show();
 	}
 
 	public void onAction(int type) {
 		switch (type) {
 			case Type.DEAL:
+				System.out.println("Selected: Deal");
+				handler.resume();
 				break;
 			case Type.CLEAR:
 				dialog.show();
@@ -95,6 +88,10 @@ public class Client extends Application {
 
 	public Display getDisplay() {
 		return display;
+	}
+
+	public void showDialog() {
+		dialog.show();
 	}
 
 	public String getId() {
