@@ -21,6 +21,14 @@ public class Hand {
 	}
 
 	/**
+	 * Get the list of cards
+	 * @param cards the cards to set
+	 */
+	public void setCards(ArrayList<Card> cards) {
+		this.cards = cards;
+	}
+
+	/**
 	 * Add a card to the gambler's hand
 	 * @param card the card to add
 	 */
@@ -36,5 +44,15 @@ public class Hand {
 		ArrayList<Card> cards = getCards();
 		this.cards.clear();
 		return cards;
+	}
+
+	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+
+		for (Card card : cards) {
+			sb.append(String.format("%s:%s ", card.getSuit().name(), card.getValue())); // CLUBS:10
+		}
+		return sb.toString();
 	}
 }

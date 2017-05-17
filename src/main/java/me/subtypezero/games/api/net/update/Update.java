@@ -21,6 +21,20 @@ public class Update {
 	}
 
 	/**
+	 * Get value by type
+	 * @param type the value type
+	 * @return the first value found or null
+	 */
+	public Value getValue(String type) {
+		for (Value value : values) {
+			if (type.equals(value.getType())) {
+				return value;
+			}
+		}
+		return null;
+	}
+
+	/**
 	 * Add a value to the list of values
 	 * @param value the value to add
 	 */

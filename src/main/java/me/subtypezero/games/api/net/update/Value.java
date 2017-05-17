@@ -3,16 +3,16 @@ package me.subtypezero.games.api.net.update;
 public class Value {
 	private String type;
 	private final String uuid;
-	private Object value;
+	private Object data;
 
-	public Value(String type, String uuid, Object value) {
+	public Value(String type, String uuid, Object data) {
 		this.type = type;
 		this.uuid = uuid;
-		this.value = value;
+		this.data = data;
 	}
 
 	/**
-	 * Get the type of value
+	 * Get the type of data
 	 * @return the type
 	 */
 	public String getType() {
@@ -28,10 +28,10 @@ public class Value {
 	}
 
 	/**
-	 * Get the value
-	 * @return the value
+	 * Get the data
+	 * @return the data
 	 */
-	public Object getValue() {
-		return value;
+	public Object getData() {
+		return data;
 	}
 }

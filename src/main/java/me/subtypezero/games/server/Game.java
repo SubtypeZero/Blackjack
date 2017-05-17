@@ -46,12 +46,21 @@ public class Game implements Runnable {
 
 	public void run() {
 		while (running) {
-			ArrayList<Player> players = (ArrayList<Player>) this.players.clone(); // Get players
-			startRound(players); // Start the round
-			dealCards(players); // Deal cards
-			takeTurns(players); // Take turns
-			showResults(players); // Calculate results
-			resetCards(players); // Reset cards
+			if (players.size() > 0) {
+				System.out.println("Starting");
+				ArrayList<Player> players = (ArrayList<Player>) this.players.clone(); // Get players
+				startRound(players); // Start the round
+				dealCards(players); // Deal cards
+				takeTurns(players); // Take turns
+				showResults(players); // Calculate results
+				resetCards(players); // Reset cards
+			} else {
+				try {
+					Thread.sleep(3000);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
 		}
 
 		// Game closed, disconnect all players
@@ -61,10 +70,15 @@ public class Game implements Runnable {
 	}
 
 	private void startRound(ArrayList<Player> players) {
+		System.out.println("Starting round");
 		Update update = new Update();
 
 		for (Player player : players) {
-			Messenger.sendMessage(player.getSocket(), new Message(Type.DEAL)); // Ask client to bet
+			Update info = new Update();
+			info.addValue(new Value("MIN", "", "" + MIN_BET));
+			info.addValue(new Value("MAX", "", "" + MAX_BET));
+			Messenger.sendMessage(player.getSocket(), new Message(Type.DEAL, gson.toJson(info))); // Ask client to bet
+
 			Message reply = Messenger.getResponse(player.getSocket()); // Get bet from client
 
 			switch (reply.getType()) {
@@ -79,33 +93,36 @@ public class Game implements Runnable {
 	}
 
 	private void dealCards(ArrayList<Player> players) {
+		System.out.println("Dealing cards");
 		Update update = new Update();
 
 		for (Player player : players) {
 			dealer.dealCards(player, 2);
-			update.addValue(new Value("HAND", player.getId(), player.getHand()));
+			update.addValue(new Value("HAND", player.getId(), player.getHand().toString()));
 		}
 		dealer.takeCards(2);
-		update.addValue(new Value("HAND", "DEALER", dealer.getHand()));
+		update.addValue(new Value("HAND", "DEALER", dealer.getHand().toString()));
 
 		sendUpdate(players, update); // Send hand data to clients
 	}
 
 	private void takeTurns(ArrayList<Player> players) {
+		System.out.println("Taking turns");
 		Update update = new Update();
 
 		// Take turns
 		for (Player player : players) {
 			player.takeTurn(dealer);
-			update.addValue(new Value("HAND", player.getId(), player.getHand()));
+			update.addValue(new Value("HAND", player.getId(), player.getHand().toString()));
 		}
 		dealer.takeTurn(); // Dealer goes last
-		update.addValue(new Value("HAND", "DEALER", dealer.getHand()));
+		update.addValue(new Value("HAND", "DEALER", dealer.getHand().toString()));
 
 		sendUpdate(players, update); // Send hand data to clients
 	}
 
 	private void showResults(ArrayList<Player> players) {
+		System.out.println("Showing results");
 		Update update = new Update();
 
 		for (Player player : players) {
@@ -136,6 +153,7 @@ public class Game implements Runnable {
 	}
 
 	private void resetCards(ArrayList<Player> players) {
+		System.out.println("Resetting cards");
 		ArrayList<Card> cards = new ArrayList<>();
 
 		for (Player player : players) {
@@ -168,13 +186,16 @@ public class Game implements Runnable {
 	 * @param clientSock the client's socket
 	 * @return true if the connection was successful
 	 */
-	public boolean connect(Socket clientSock) {
+	public synchronized boolean connect(Socket clientSock) {
 		if (isOpen()) {
 			Player player = new Player(clientSock, INIT_BAL);
 			players.add(player);
 
 			// The client has been connected, send their UUID
-			Messenger.sendMessage(clientSock, new Message(Type.JOIN, player.getId()));
+			Update update = new Update();
+			update.addValue(new Value("ID", player.getId(), null));
+			update.addValue(new Value("BALANCE", player.getId(), player.getBalance()));
+			Messenger.sendMessage(clientSock, new Message(Type.JOIN, gson.toJson(update)));
 			return true;
 		}
 		return false;
