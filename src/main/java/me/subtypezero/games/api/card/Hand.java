@@ -51,7 +51,7 @@ public class Hand {
 		StringBuilder sb = new StringBuilder();
 
 		for (Card card : cards) {
-			sb.append(String.format("%s:%s ", card.getSuit().name(), card.getValue())); // CLUBS:10
+			sb.append(card.toString() + " "); // CLUBS:10
 		}
 		return sb.toString();
 	}

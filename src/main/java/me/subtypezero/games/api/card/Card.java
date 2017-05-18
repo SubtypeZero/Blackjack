@@ -41,4 +41,9 @@ public class Card {
 		}
 		return value;
 	}
+
+	@Override
+	public String toString() {
+		return String.format("%s:%s", suit.name(), value);
+	}
 }

@@ -100,7 +100,9 @@ public class Dialog extends BorderPane {
 	}
 
 	public void show() {
-		stage.showAndWait();
+		if (!stage.isShowing()) {
+			stage.showAndWait();
+		}
 	}
 
 	private void setBet() {

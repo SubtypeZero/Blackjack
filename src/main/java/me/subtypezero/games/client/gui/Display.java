@@ -29,24 +29,27 @@ public class Display extends BorderPane {
 		gamePane.getChildren().add(new CardPane("Player 1"));
 		gamePane.getChildren().add(new CardPane("Player 2"));
 		gamePane.getChildren().add(new CardPane("Player 3"));
+		gamePane.getChildren().add(new ResultPane("Results"));
 
 		setCenter(gamePane);
 		setBottom(optionPane);
 		// Setup info view
 
-		showOptions();
+		showOptions(false);
 	}
 
-	public void showOptions() {
+	public void showOptions(boolean canClear) {
 		optionPane.getChildren().clear(); // Clear previous options
 
 		Button btnDeal = new Button("Deal");
 		btnDeal.setOnAction(e -> client.onAction(Type.DEAL));
 		optionPane.getChildren().add(btnDeal);
 
-		Button btnClear = new Button("Clear");
-		btnClear.setOnAction(e -> client.onAction(Type.CLEAR));
-		optionPane.getChildren().add(btnClear);
+		if (canClear) {
+			Button btnClear = new Button("Clear");
+			btnClear.setOnAction(e -> client.onAction(Type.CLEAR));
+			optionPane.getChildren().add(btnClear);
+		}
 	}
 
 	public void showActions(boolean canDouble) {
@@ -67,12 +70,8 @@ public class Display extends BorderPane {
 		optionPane.getChildren().add(btnStand);
 	}
 
-	public void showTableInfo(int maxBet, int minBet) {
-
-	}
-
-	public void showPlayerInfo(int balance, int bet) {
-
+	public void clearOptions() {
+		optionPane.getChildren().clear();
 	}
 
 	public CardPane getCardPane(int index) {
@@ -91,5 +90,9 @@ public class Display extends BorderPane {
 
 	public void clearCards(int index) {
 		getCardPane(index).clearCards();
+	}
+
+	public ResultPane getResultPane() {
+		return (ResultPane) gamePane.getChildren().get(gamePane.getChildren().size() - 1); // The result pane is the last pane
 	}
 }
