@@ -75,6 +75,7 @@ public class Game implements Runnable {
 
 		for (Player player : players) {
 			Message reply = Messenger.getResponse(player.getSocket()); // Get bet from client
+			System.out.println(reply.getType() + ":" + reply.getData());
 
 			switch (reply.getType()) {
 				case Type.BET:
@@ -83,6 +84,7 @@ public class Game implements Runnable {
 			}
 			update.addValue(new Value("ID", player.getId(), null)); // Add UUID to update
 			update.addValue(new Value("BET", player.getId(), player.getBet())); // Add bet to update
+			update.addValue(new Value("BALANCE", player.getId(), player.getBalance())); // Add balance to update
 		}
 		sendUpdate(players, update); // Send player data to clients
 	}

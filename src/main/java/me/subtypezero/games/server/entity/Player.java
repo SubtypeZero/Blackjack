@@ -1,12 +1,10 @@
 package me.subtypezero.games.server.entity;
 
-import com.google.gson.Gson;
+import me.subtypezero.games.api.card.Card;
 import me.subtypezero.games.api.entity.Gambler;
 import me.subtypezero.games.api.net.Message;
 import me.subtypezero.games.api.net.Messenger;
 import me.subtypezero.games.api.net.update.Type;
-import me.subtypezero.games.api.net.update.Update;
-import me.subtypezero.games.api.net.update.Value;
 
 import java.net.Socket;
 import java.util.UUID;
@@ -29,6 +27,7 @@ public class Player extends Gambler {
 	}
 
 	public void takeTurn(Dealer dealer) {
+		boolean canDouble = false;
 		boolean start = true;
 		boolean done = false;
 
@@ -36,24 +35,30 @@ public class Player extends Gambler {
 			int highest = dealer.getHighest(getHandValues());
 			int lowest = dealer.getLowest(getHandValues());
 
-			Update update = new Update();
-
-			if (highest < 0 && lowest > 21) {
-				update.addValue(new Value("ACTION", "", "BUST")); // Bust, no options
-			} else if (start) {
+			if (start) {
 				for (int value : getHandValues()) {
 					if (9 <= value && value <= 11) {
-						update.addValue(new Value("ACTION", "", "DOUBLE")); // Available on opening hand value from 9 to 11
+						canDouble = true; // Available on opening hand value from 9 to 11
+						break;
 					}
 				}
 				start = false;
-			} else {
-				update.addValue(new Value("ACTION", "", "NORMAL"));
 			}
 
 			// Send options to client
-			Gson gson = new Gson();
-			Messenger.sendMessage(socket, new Message(Type.UPDATE, gson.toJson(update)));
+			if (highest < 0 && lowest > 21) {
+				Messenger.sendMessage(socket, new Message(Type.UPDATE, "NONE")); // bust
+				System.out.println("Sent NONE");
+			} else if (highest == 21) {
+				Messenger.sendMessage(socket, new Message(Type.UPDATE, "NONE")); // blackjack
+				System.out.println("Sent NONE");
+			} else if (canDouble) {
+					Messenger.sendMessage(socket, new Message(Type.UPDATE, "DOUBLE")); // double, hit, stand
+				System.out.println("Sent DOUBLE");
+			} else {
+				Messenger.sendMessage(socket, new Message(Type.UPDATE, "NORMAL")); // hit, stand
+				System.out.println("Sent NORMAL");
+			}
 
 			// Get response from client
 			Message msg = Messenger.getResponse(socket);
@@ -61,13 +66,16 @@ public class Player extends Gambler {
 			switch (msg.getType()) {
 				case Type.DOUBLE:
 					bet = bet * 2; // double the bet
-					break;
 				case Type.HIT:
-					dealer.dealCards(this, 1); // take another card
+					Card last = dealer.dealCard(this); // deal another card, end the turn
+					Messenger.sendMessage(socket, new Message(Type.UPDATE, last.toString())); // e.g. CLUBS:10
 					break;
 				case Type.STAND:
-					done = true;
 					break;
+			}
+
+			if (msg.getType() != Type.HIT) {
+				done = true;
 			}
 		}
 	}

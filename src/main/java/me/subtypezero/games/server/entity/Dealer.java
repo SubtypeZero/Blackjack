@@ -59,6 +59,17 @@ public class Dealer extends Gambler {
 	}
 
 	/**
+	 * Deal a card to a player
+	 * @param player the player
+	 * @return the card dealt
+	 */
+	public Card dealCard(Player player) {
+		dealCards(player, 1);
+		ArrayList<Card> cards = player.getHand().getCards();
+		return cards.get(cards.size() - 1);
+	}
+
+	/**
 	 * Make the dealer take cards from the deck
 	 * @param amount the number of cards to take
 	 */

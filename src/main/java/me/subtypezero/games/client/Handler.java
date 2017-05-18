@@ -12,6 +12,8 @@ import me.subtypezero.games.api.net.update.Value;
 import me.subtypezero.games.client.entity.Player;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map.Entry;
 
 public class Handler extends Thread {
 	private Gson gson;
@@ -63,109 +65,155 @@ public class Handler extends Thread {
 
 	private void startRound() {
 		System.out.println("Starting round");
-		Message info = getMessage(); // Get player info
+		Update update = getUpdate(getMessage().getData()); // Get player info
 
-		if (info.getType() == Type.UPDATE) {
-			Update update = getUpdate(info.getData());
+		for (Value value : update.getValues()) {
+			if (value.getId().equals(client.getId())) {
+				continue;
+			}
 
-			for (Value value : update.getValues()) {
-				if (value.getId().equals(client.getId())) {
-					continue;
-				}
+			String id = value.getId();
+			Player player = getPlayerById(id);
 
-				switch (value.getType()) {
-					case "ID":
-						String id = value.getId();
-
-						if (!clientIds.contains(id)) {
-							clientIds.add(id);
-							players.add(new Player(id, initBal));
-						}
-						break;
-					case "BET":
-						Player player = getPlayerById(value.getId());
-
-						if (player != null) {
-							player.setBet(Integer.parseInt((String) value.getData()));
-						}
-						break;
-					case "BALANCE":
-						// TODO Add this feature so balance doesn't reset every round
-						break;
-				}
+			switch (value.getType()) {
+				case "ID":
+					if (!clientIds.contains(id)) {
+						clientIds.add(id);
+						players.add(new Player(id, initBal));
+					}
+					break;
+				case "BET":
+					if (player != null) {
+						player.setBet(Integer.parseInt((String) value.getData()));
+					}
+					break;
+				case "BALANCE":
+					if (player != null) {
+						player.setBalance(Integer.parseInt((String) value.getData()));
+					}
+					break;
 			}
 		}
-
-		System.out.println("Waiting...");
 		suspend();
-		System.out.println("Dealing cards");
 		dealCards();
 	}
 
 	private void dealCards() {
 		System.out.println("Dealing cards");
-		Messenger.sendMessage(client.getSocket(), new Message(Type.BET, "" + getBet())); // Send bet to server
-		Message info = getMessage();
-
-		if (info.getType() == Type.UPDATE) {
-			Update update = getUpdate(info.getData());
-
-			for (Value value : update.getValues()) {
-				if (value.getType().equals("HAND")) {
-					getPlayerById(value.getId()).getHand().setCards(getCardsFromString((String) value.getData())); // Get hand data
-				}
-			}
-		}
+		updateHands();
 		updateCards(); // Update the display
 		takeTurns();
 	}
 
 	private void takeTurns() {
+		System.out.println("Taking turns");
 		boolean done = false;
+		Message msg = getMessage();
+
+		System.out.println("Message: " + msg.getType() + ":" + msg.getData());
+
+		if (msg.getData().equals("NONE")) {
+			clearOptions(); // blackjack or bust
+			updateHands();
+			done = true;
+		}
+
+		System.out.println("Entering loop");
 
 		while (!done) {
-			Message msg = getMessage();
+			System.out.println("DATA - " + msg.getData());
 
-			if (msg.getType() == Type.UPDATE) {
-				Update update = getUpdate(msg.getData());
+			switch (msg.getData()) {
+				case "DOUBLE":
+					System.out.println("DOUBLE");
+					showActions(true); // double, hit, stand
+					done = true;
+					suspend();
+					break;
+				case "NORMAL":
+					System.out.println("NORMAL");
+					showActions(false); // hit, stand
+					suspend();
+					break;
+				case "NONE":
+					System.out.println("NONE");
+					clearOptions(); // blackjack or bust
+					done = true;
+					break;
+				default:
+					System.out.println("DEFAULT");
+					Update update = getUpdate(msg.getData());
 
-				String action = (String) update.getValues().get(0).getData(); // TODO Fix null pointer exception
-
-				Platform.runLater(new Runnable() {
-					@Override
-					public void run() {
-
-						switch (action) {
-							case "DOUBLE":
-								// double, hit, stand
-								client.getDisplay().showActions(true);
-								break;
-							case "NORMAL":
-								// hit, stand
-								client.getDisplay().showActions(false);
-								break;
-							case "BUST":
-								// bust
-								client.getDisplay().showOptions();
-								break;
+					for (Value value : update.getValues()) {
+						if (value.getType().equals("HAND")) {
+							getPlayerById(value.getId()).getHand().setCards(getCardsFromString((String) value.getData())); // Get hand data
 						}
 					}
-				});
-
-				// TODO Wait for selection, send choice to server (double, hit, stand)
-				// Messenger.sendMessage(client.getSocket(), new Message(Type.STAND, null));
+					return;
 			}
+			msg = getMessage();
 		}
 		showResults();
 	}
 
 	private void showResults() {
+		System.out.println("Showing results");
+		HashMap<String, Integer> results = new HashMap<>();
 
+		Update update = getUpdate(getMessage().getData()); // Get results
+
+		for (Value value : update.getValues()) {
+			Player player = getPlayerById(value.getId());
+			String[] values = ((String) update.getValues().get(0).getData()).split(",");
+
+			int result = Integer.parseInt(values[0]);
+			int balance = Integer.parseInt(values[1]);
+
+			results.put(value.getId(), result);
+			player.setBalance(balance);
+		}
+
+		Platform.runLater(new Runnable() {
+			@Override
+			public void run() {
+				for (Entry<String, Integer> entry : results.entrySet()) {
+					Player player = getPlayerById(entry.getKey());
+					int result = entry.getValue();
+
+					switch (result) {
+						case Type.WIN:
+							client.getDisplay().getResultPane().addResult(player, "Win");
+							break;
+						case Type.LOSE:
+							client.getDisplay().getResultPane().addResult(player, "Lose");
+							break;
+						case Type.PUSH:
+							client.getDisplay().getResultPane().addResult(player, "Push");
+							break;
+						case Type.BLACKJACK:
+							client.getDisplay().getResultPane().addResult(player, "Blackjack");
+							break;
+					}
+				}
+				client.getDisplay().showOptions(true); // Allow the client to start a new game
+			}
+		});
+		showOptions(true);
+		System.out.println("Showing options");
 	}
 
 	public void clearTable() {
 		System.out.println("Clearing table");
-		clearCards();
+		Platform.runLater(new Runnable() {
+			@Override
+			public void run() {
+				for (int i = 0; i < players.size(); i++) {
+					client.getDisplay().clearCards(i); // Clear all cards
+				}
+				client.getDisplay().getResultPane().clearResults();
+			}
+		});
+
 		clientIds.clear();
 		players.clear();
 
@@ -189,7 +237,7 @@ public class Handler extends Thread {
 	 * Get a message from the server
 	 * @return
 	 */
-	private Message getMessage() {
+	public Message getMessage() {
 		return Messenger.getResponse(client.getSocket());
 	}
 
@@ -198,7 +246,7 @@ public class Handler extends Thread {
 	 * @param data the JSON string
 	 * @return the update
 	 */
-	private Update getUpdate(String data) {
+	public Update getUpdate(String data) {
 		return gson.fromJson(data, Update.class);
 	}
 
@@ -240,6 +288,16 @@ public class Handler extends Thread {
 		}
 	}
 
+	private void updateHands() {
+		Update update = getUpdate(getMessage().getData());
+
+		for (Value value : update.getValues()) {
+			if (value.getType().equals("HAND")) {
+				getPlayerById(value.getId()).getHand().setCards(getCardsFromString((String) value.getData())); // Get hand data
+			}
+		}
+	}
+
 	/**
 	 * Update all cards in the display
 	 */
@@ -255,16 +313,29 @@ public class Handler extends Thread {
 		});
 	}
 
-	/**
-	 * Clear all cards in the display
-	 */
-	private void clearCards() {
+	private void clearOptions() {
 		Platform.runLater(new Runnable() {
 			@Override
 			public void run() {
-				for (int i = 0; i < players.size(); i++) {
-					client.getDisplay().clearCards(i);
-				}
+				client.getDisplay().clearOptions();
+			}
+		});
+	}
+
+	private void showOptions(boolean canClear) {
+		Platform.runLater(new Runnable() {
+			@Override
+			public void run() {
+				client.getDisplay().showOptions(canClear);
+			}
+		});
+	}
+
+	private void showActions(boolean canDouble) {
+		Platform.runLater(new Runnable() {
+			@Override
+			public void run() {
+				client.getDisplay().showActions(canDouble);
 			}
 		});
 	}
