@@ -108,13 +108,14 @@ public class Handler extends Thread {
 	private void takeTurns() {
 		System.out.println("Taking turns");
 		boolean done = false;
+		boolean cardsUpdated = false;
 		Message msg = getMessage();
 
 		System.out.println("Message: " + msg.getType() + ":" + msg.getData());
 
 		if (msg.getData().equals("NONE")) {
 			clearOptions(); // blackjack or bust
-			updateHands();
+			// updateHands();
 			done = true;
 		}
 
@@ -129,6 +130,12 @@ public class Handler extends Thread {
 					showActions(true); // double, hit, stand
 					done = true;
 					suspend();
+
+					ArrayList<Card> cards = getCardsFromString(getMessage().getData());
+					for (Card card : cards) {
+						players.get(1).getHand().getCards().add(card);
+					}
+					updateCards();
 					break;
 				case "NORMAL":
 					System.out.println("NORMAL");
@@ -144,14 +151,21 @@ public class Handler extends Thread {
 					System.out.println("DEFAULT");
 					Update update = getUpdate(msg.getData());
 
+					System.out.println(msg.getData());
+
 					for (Value value : update.getValues()) {
 						if (value.getType().equals("HAND")) {
 							getPlayerById(value.getId()).getHand().setCards(getCardsFromString((String) value.getData())); // Get hand data
 						}
 					}
-					return;
+					cardsUpdated = true;
+					done = true;
+					break;
 			}
-			msg = getMessage();
+
+			if (!cardsUpdated && !done) {
+				msg = getMessage();
+			}
 		}
 		showResults();
 	}
